@@ -1,28 +1,27 @@
 <html>
-  <head>
-    <title>Vue.js Pet Depot</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
-    <!-- We are using Font Awesome to create the cart icon  -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-  </head>
-  <body>
-    <div id="app">
-      <header>
-        <h1 v-text="sitename">{{ sitename }}</h1>
-        <button>
-          <!-- 'cartItemCount' is used the same way as a data property. -->
-          {{ cartItemCount }}
-          <!-- add the cart icon -->
-          <span><i class="fa-solid fa-cart-shopping"></i> Checkout</span>
-        </button>
-      </header>
-      <main>
+
+<head>
+  <title>Vue.js Pet Depot</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
+  <!-- We are using Font Awesome to create the cart icon  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1 v-text="sitename">{{ sitename }}</h1>
+      <button v-on:click="showCheckout">
+        <!-- 'cartItemCount' is used the same way as a data property. -->
+        {{ cartItemCount }}
+        <!-- add the cart icon -->
+        <span><i class="fa-solid fa-cart-shopping"></i> Checkout</span>
+      </button>
+    </header>
+    <main>
+      <div v-if="showProduct">
         <figure>
           <!-- bind the 'src' attribute to the 'product.image' in 'data' -->
           <img v-bind:src="product.image" alt="sleepy dnd" />
@@ -34,50 +33,113 @@
         <!-- <input type="button" value="add" @click="addItem" /> -->
         <!-- only show the button when 'canAddToCart' is true -->
         <!-- <button @click="addToCart" v-show="canAddToCart">Add to Cart</button> -->
+        <!-- v-show whatever products customer is adding more than the stock limit - it will only show if canAddToCart is true -->
         <button @click="addToCart" v-show="canAddToCart" v-if="canAddToCart">
           Add to Cart
         </button>
         <button disabled="disabled" v-else>Add to Cart</button>
-      </main>
-    </div>
-    <script type="text/javascript">
-      var webstore = new Vue({
-        el: "#app",
-        data: {
-          sitename: "Vue.js Pet Depot",
-          product: {
-            id: 1001,
-            title: "Cat Food, 25lb bag",
-            description:
-              "A 25 pound bag of <em>irresistible</em>, organic goodness for your cat.",
-            price: 2000,
-            image:
-              "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
-            availableInventory: 5,
-          },
-          cart: [], // array to store items in shopping cart
+      </div>
+      <div v-else>
+        <h2>Checkout</h2>
+        <p>
+          <strong>First Name:</strong>
+          <!-- This input field is bound to firstName in the order object -->
+          <input v-model="order.firstName">
+        </p>
+        <p>
+          <strong>Last Name:</strong>
+          <!-- This input field is bound to lastName in the order object -->
+          <input v-model="order.lastName">
+        </p>
+        <p>
+          <strong>Address:</strong>
+          <input v-model="order.address">
+        </p>
+        <p>
+          <strong>City:</strong>
+          <input v-model="order.city">
+        </p>
+        <p>
+          <strong>Zip:</strong>
+          <input v-model="order.zip">
+        </p>
+        <p>
+          <strong>State:</strong>
+          <select v-model="order.state">
+            <option disabled value="">State</option>
+            <option>AL</option>
+            <option>AR</option>
+            <option>CA</option>
+            <option>NW</option>
+          </select>
+        </p>
+        <h2>Order Information</h2>
+        <p>First Name: {{ order.firstName }}</p>
+        <p>Last Name: {{ order.lastName }}</p>
+        <p>Address: {{ order.address }}</p>
+        <p>City: {{ order.city }}</p>
+        <p>Zip: {{ order.zip }}</p>
+        <p>State: {{ order.state }}</p>
+      </div>
+    </main>
+  </div>
+  <script type="text/javascript">
+    //
+    var webstore = new Vue({
+      el: "#app",
+      data: {
+        sitename: "Vue.js Pet Depot",
+        product: {
+          id: 1001,
+          title: "Cat Food, 25lb bag",
+          description:
+            "A 25 pound bag of <em>irresistible</em>, organic goodness for your cat.",
+          price: 2000,
+          image:
+            "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
+          availableInventory: 5,
         },
-        methods: {
-          addToCart: function () {
-            this.cart.push(this.product.id); // pushing product id to the cart array
-            console.log(this.cart);
-          },
+        cart: [], // array to store items in shopping cart
+        showProduct: true,
+        order: {
+          firstName: "",
+          lastName: "",
+          address: "",
+          city: "",
+          zip: "",
+          state: "",
+        }
+      },
+      methods: {
+        addToCart: function () {
+          this.cart.push(this.product.id); // pushing product id to the cart array
+          console.log(this.cart);
         },
-        computed: {
-          // the Computed Property object
-          cartItemCount: function () {
-            // the property name
-            // its value is calculated when it is called
-            console.log("carItemCount");
-            return this.cart.length || "";
-          },
-          canAddToCart() {
-            // add and check available inventory
-            console.log("canAddToCart");
-            return this.product.availableInventory > this.cartItemCount;
-          },
+        showCheckout() {
+          // console.log(this.showProduct);
+          // if this.showProduct is true return false else true
+          // if showCheckout returns true it shows the products if its false it shows checkout
+          this.showProduct = this.showProduct ? false : true
+        }
+      },
+      computed: {
+        // the Computed Property object
+        cartItemCount: function () {
+          // the property name
+          // its value is calculated when it is called
+          console.log("carItemCount");
+          return this.cart.length || "";
         },
-      });
-    </script>
-  </body>
+        // checks whether we are able to add items to the cart based on what's there in our available inventory 
+        canAddToCart() {
+          // add and check available inventory
+          console.log("canAddToCart");
+          //availableInventory greater than carItemCount
+          return this.product.availableInventory > this.cartItemCount;
+        },
+      },
+    });
+  </script>
+</body>
+
 </html>
