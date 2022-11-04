@@ -12,7 +12,7 @@
 <body>
   <div id="app">
     <header>
-      <h1 v-text="sitename">{{ sitename }}</h1>
+      <h1 v-text="header"></h1>
       <button v-on:click="showCheckout">
         <!-- 'cartItemCount' is used the same way as a data property. -->
         {{ cartItemCount }}
@@ -85,10 +85,10 @@
   </div>
   <script type="text/javascript">
     //
-    var webstore = new Vue({
+    var vueInstance = new Vue({
       el: "#app",
       data: {
-        sitename: "Vue.js Pet Depot",
+        header: "Vue.js Pet Depot",
         product: {
           id: 1001,
           title: "Cat Food, 25lb bag",
@@ -127,7 +127,7 @@
         cartItemCount: function () {
           // the property name
           // its value is calculated when it is called
-          console.log("carItemCount");
+          console.log("cartItemCount");
           return this.cart.length || "";
         },
         // checks whether we are able to add items to the cart based on what's there in our available inventory 
