@@ -44,12 +44,13 @@
         <p>
           <strong>First Name:</strong>
           <!-- This input field is bound to firstName in the order object -->
-          <input v-model="order.firstName">
+          <!-- .trim removes whitespace only from the beginning -->
+          <input v-model.trim="order.firstName">
         </p>
         <p>
           <strong>Last Name:</strong>
           <!-- This input field is bound to lastName in the order object -->
-          <input v-model="order.lastName">
+          <input v-model.trim="order.lastName">
         </p>
         <p>
           <strong>Address:</strong>
@@ -67,11 +68,12 @@
           <strong>State:</strong>
           <select v-model="order.state">
             <option disabled value="">State</option>
-            <option>AL</option>
-            <option>AR</option>
-            <option>CA</option>
-            <option>NW</option>
+            <option v-for="(state, key) in states" v-bind:value="state">{{ key }}</option>
           </select>
+        </p>
+        <p>
+          <input type="radio" id="home" value="Home" v-model="order.method" /><label for="home">Home</label><input
+            type="radio" id="business" value="Business" v-model="order.method" /><label for="business">Business</label>
         </p>
         <h2>Order Information</h2>
         <p>First Name: {{ order.firstName }}</p>
@@ -80,6 +82,9 @@
         <p>City: {{ order.city }}</p>
         <p>Zip: {{ order.zip }}</p>
         <p>State: {{ order.state }}</p>
+        <p>Gift: {{ order.gift }}</p>
+        <p>Method: {{ order.method }}</p>
+        <button v-on:click="submitForm">Place Order</button>
       </div>
     </main>
   </div>
@@ -108,6 +113,16 @@
           city: "",
           zip: "",
           state: "",
+          method: "Home",
+          gift: "Send as a Gift",
+          sendGift: "Send as a Gift",
+          dontSendGift: "Send as a Gift",
+        },
+        states: {
+          AL: "Alaska",
+          AR: "Arizona",
+          CA: "California",
+          NV: "Nevada",
         }
       },
       methods: {
@@ -120,6 +135,9 @@
           // if this.showProduct is true return false else true
           // if showCheckout returns true it shows the products if its false it shows checkout
           this.showProduct = this.showProduct ? false : true
+        },
+        submitForm() {
+          alert("Order Submitted");
         }
       },
       computed: {
