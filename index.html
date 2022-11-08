@@ -2,6 +2,8 @@
 
 <head>
   <title>Vue.js Pet Depot</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="products.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
   <!-- We are using Font Awesome to create the cart icon  -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
@@ -22,22 +24,38 @@
     </header>
     <main>
       <div v-if="showProduct">
-        <figure>
-          <!-- bind the 'src' attribute to the 'product.image' in 'data' -->
-          <img v-bind:src="product.image" alt="sleepy dnd" />
-        </figure>
-        <h2 v-text="product.title"></h2>
-        <p v-html="product.description"></p>
-        <!-- The double curly brackets is te shorter version of 'v-text' - mustache syntax -->
-        <p>Price: {{ product.price }}</p>
-        <!-- <input type="button" value="add" @click="addItem" /> -->
-        <!-- only show the button when 'canAddToCart' is true -->
-        <!-- <button @click="addToCart" v-show="canAddToCart">Add to Cart</button> -->
-        <!-- v-show whatever products customer is adding more than the stock limit - it will only show if canAddToCart is true -->
-        <button @click="addToCart" v-show="canAddToCart" v-if="canAddToCart">
-          Add to Cart
-        </button>
-        <button disabled="disabled" v-else>Add to Cart</button>
+        <div v-for="product in sortedProducts" id="rounding">
+          <figure>
+            <!-- bind the 'src' attribute to the 'product.image' in 'data' -->
+            <img v-bind:src="product.image" alt="sleepy dnd" id="resize" />
+          </figure>
+          <h2 v-text="product.title"></h2>
+          <p v-html="product.description"></p>
+          <!-- The double curly brackets is te shorter version of 'v-text' - mustache syntax -->
+          <p>Available Stock:{{ product.availableInventory - cartCount(product.id) }}</p>
+          <p>Price: {{ product.price }}</p>
+          <!-- <input type="button" value="add" @click="addItem" /> -->
+          <!-- only show the button when 'canAddToCart' is true -->
+          <!-- <button @click="addToCart" v-show="canAddToCart">Add to Cart</button> -->
+          <!-- v-show whatever products customer is adding more than the stock limit - it will only show if canAddToCart is true -->
+          <button @click="addToCart(product)" v-if="canAddToCart(product)">
+            Add to Cart
+          </button>
+          <button disabled="disabled" v-else>Add to Cart</button>
+          <!-- whenever it's less than 5 -->
+          <span v-if="product.availableInventory === cartCount(product.id)">
+            All out!
+          </span>
+          <!-- whenever it's less than 5 -->
+          <span v-else-if="product.availableInventory - cartCount(product.id) < 5">
+            Only {{ product.availableInventory - cartCount(product.id) }} left!
+          </span>
+          <span v-else>Buy Now!</span>
+          <div>
+            <span v-for="n in product.rating"><i class="fa-solid fa-star"></i></span>
+            <span v-for="n in 5 - product.rating"><i class="fa-regular fa-star"></i></span>
+          </div>
+        </div>
       </div>
       <div v-else>
         <h2>Checkout</h2>
@@ -94,16 +112,9 @@
       el: "#app",
       data: {
         header: "Vue.js Pet Depot",
-        product: {
-          id: 1001,
-          title: "Cat Food, 25lb bag",
-          description:
-            "A 25 pound bag of <em>irresistible</em>, organic goodness for your cat.",
-          price: 2000,
-          image:
-            "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
-          availableInventory: 5,
-        },
+        // The first 'products' is a Vue instance/property
+        // The second 'products' is an array from products.js
+        products: products,
         cart: [], // array to store items in shopping cart
         showProduct: true,
         order: {
@@ -126,8 +137,8 @@
         }
       },
       methods: {
-        addToCart: function () {
-          this.cart.push(this.product.id); // pushing product id to the cart array
+        addToCart: function (product) {
+          this.cart.push(product.id); // pushing product id to the cart array
           console.log(this.cart);
         },
         showCheckout() {
@@ -138,7 +149,23 @@
         },
         submitForm() {
           alert("Order Submitted");
-        }
+        },
+        // checks whether we are able to add items to the cart based on what's there in our available inventory 
+        canAddToCart(product) {
+          // add and check available inventory
+          console.log("canAddToCart");
+          //availableInventory greater than carItemCount
+          return product.availableInventory > this.cartCount(product.id);
+        },
+        cartCount(id) {
+          let count = 0
+          for (let i = 0; i < this.cart.length; i++) {
+            if (this.cart[i] === id) {
+              count++
+            }
+          }
+          return count;
+        },
       },
       computed: {
         // the Computed Property object
@@ -148,13 +175,17 @@
           console.log("cartItemCount");
           return this.cart.length || "";
         },
-        // checks whether we are able to add items to the cart based on what's there in our available inventory 
-        canAddToCart() {
-          // add and check available inventory
-          console.log("canAddToCart");
-          //availableInventory greater than carItemCount
-          return this.product.availableInventory > this.cartItemCount;
-        },
+        sortedProducts() {
+          let productsArray = this.products.slice(0);
+          function compare(a, b) {
+            if (a.price > b.price)
+              return 1;
+            if (a.price < b.price)
+              return -1;
+            return 0
+          }
+          return productsArray.sort(compare)
+        }
       },
     });
   </script>
